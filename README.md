@@ -83,3 +83,73 @@ em.createQuery("SELECT m from Member as m").getResultList();
 - JPA는 SQL을 추상화한 JPQL이라는 객체지향 쿼리언어를 제공함. JPQL을 통해 엔티티 중심의 쿼리를 작성하고, JPA가 각 DBMS별 방언에 맞게 쿼리를 작성하여 날려줌
 
 ---
+
+## 엔티티의 생명주기
+
+![EntityLifeCycle.png](img/EntityLifeCycle.png)
+
+- 비영속 : 영속성 컨텍스트와 무관하게 새로운 상태
+  - 예> new Member();
+
+- 영속 : 영속성 컨텍스트에 관리되는 상태
+  - em.persist(member);
+
+- 준영속 : 영속성 컨텍스트의 관리에서 벗어난 상태
+  - em.detach(member);
+
+- 삭제 : 엔티티를 영속성 컨텍스트, DB에서 삭제
+  - em.remove()
+
+
+<details>
+<summary>예시 코드</summary>
+<div markdown="1">
+
+### 실험
+```java
+// 비영속
+Member member = new Member(); // new (비영속)
+member.setId(102L);
+member.setName("helloJPA");
+
+// 영속
+System.out.println("=== BEFORE ===");
+em.persist(member); // 영속(managed)
+System.out.println("=== AFTER ===");
+
+// 제거
+em.remove(member);
+tx.commit();
+```
+- 객체 생성
+- 객체를 persist
+  - persist 전, 후에 sout문을 두어, 언제 쿼리가 실행되는지 확인하기
+- 객체를 remove
+
+## 결과
+
+```
+=== BEFORE ===
+=== AFTER ===
+Hibernate: 
+    /* insert hellojpa.Member
+        */ insert 
+        into
+            Member
+            (name, id) 
+        values
+            (?, ?)
+Hibernate: 
+    /* delete hellojpa.Member */ delete 
+        from
+            Member 
+        where
+            id=?
+```
+- before, after 이후 쿼리가 연이어 나감.
+- persist는 실제로 저장하는 것이 아니며, 영속성 컨텍스트가 중간에서 어떤 역할을 수행함을 알 수 있다.
+
+</div>
+</details>
+
+---

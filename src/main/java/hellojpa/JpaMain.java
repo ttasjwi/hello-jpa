@@ -14,7 +14,19 @@ public class JpaMain {
         tx.begin();
 
         try {
-            //... 작업
+            // 비영속
+            Member member = new Member(); // new (비영속)
+            member.setId(103L);
+            member.setName("helloJPA");
+
+            // 영속
+            System.out.println("=== BEFORE ===");
+            em.persist(member); // 영속(managed)
+            System.out.println("=== AFTER ===");
+
+            // 제거
+            em.remove(member);
+
             tx.commit();
         } catch(Exception e) {
             tx.rollback();
