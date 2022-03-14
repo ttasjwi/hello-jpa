@@ -153,3 +153,41 @@ Hibernate:
 </details>
 
 ---
+
+## 영속성 컨텍스트 -  1차 캐시, 영속 엔티티의 동일성 보장
+
+- 영속성 컨텍스트는 엔티티를 1차 캐시에 우선적으로 저장한다.
+- key로 id, value로 엔티티를 저장함.
+- 객체를 찾아올 때 1차 캐시에서 우선적으로 조회하고 존재하면 쿼리를 날려서 찾아오지 않고 바로 1차캐시에서 가져온다.
+- 같은 캐시에서 찾아오므로 같은 영속성 컨텍스트의 동일 트랜잭션에서 관리되는 객체는 동일성(주솟값 같음)을 보장함
+
+<details>
+<summary>예시 코드</summary>
+<div markdown="1">
+
+### 실험
+```java
+Member member1 = em.find(Member.class, 101L);
+Member member2 = em.find(Member.class, 101L);
+System.out.println("member1 == member2 ? : " + (member1 ==member2));
+tx.commit();
+```
+- 동일한 id로 EM을 통해 찾아오기 요청
+
+### 결과
+```
+Hibernate: 
+    select
+        member0_.id as id1_0_0_,
+        member0_.name as name2_0_0_ 
+    from
+        Member member0_ 
+    where
+        member0_.id=?
+member1 == member2 ? : true
+```
+- 실제로 select 쿼리가 날려지는 것은 단 한번
+- 1차 캐시에 저장된 동일 객체를 찾아옴.
+- 같은 캐싱된 객체를 찾아오므로 동일성이 보장된다.
+
+---
