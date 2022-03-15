@@ -191,3 +191,55 @@ member1 == member2 ? : true
 - 같은 캐싱된 객체를 찾아오므로 동일성이 보장된다.
 
 ---
+
+# 영속성 컨텍스트 - 트랜잭션을 지원하는 쓰기 지연
+- `persist` : 영속성 컨텍스트의 1차 캐시에 저장 + 쓰기 지연 SQL 저장소에 쿼리를 저장함 
+- tx.commit() -> flush(쿼리 날아감), commit(실제 반영)이 일어나며 실제로 DB에 반영됨
+- 이를 활용하여, 대량의 쿼리를 날리는 것을 커밋 직전까지 지연시키고 모아서 처리(배치 처리) 가능.
+  - 배치사이즈 조절 : `<property name="hibernate.jdbc.batch_size" value="..."/>`
+
+<details>
+<summary>예시 코드</summary>
+<div markdown="1">
+
+### 실험
+```java
+            Member member1 = new Member(150L, "A");
+            Member member2 = new Member(160L, "B");
+
+            em.persist(member1);
+            em.persist(member2);
+            System.out.println("=======================================");
+            
+            tx.commit();
+```
+- 객체 생성 후 persist
+- sout문으로 구분선을 그어줌.
+- commit
+### 결과
+```
+=======================================
+Hibernate: 
+    /* insert hellojpa.Member
+        */ insert 
+        into
+            Member
+            (name, id) 
+        values
+            (?, ?)
+Hibernate: 
+    /* insert hellojpa.Member
+        */ insert 
+        into
+            Member
+            (name, id) 
+        values
+            (?, ?)
+```
+- 실제 실행 시 구분선이 먼저 뜨고 쿼리가 날아감
+- commit 이후 실제 쿼리가 날아감을 알 수 있음
+
+</div>
+</details>
+
+---
