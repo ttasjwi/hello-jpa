@@ -192,7 +192,7 @@ member1 == member2 ? : true
 
 ---
 
-# 영속성 컨텍스트 - 트랜잭션을 지원하는 쓰기 지연
+## 영속성 컨텍스트 - 트랜잭션을 지원하는 쓰기 지연
 - `persist` : 영속성 컨텍스트의 1차 캐시에 저장 + 쓰기 지연 SQL 저장소에 쿼리를 저장함 
 - tx.commit() -> flush(쿼리 날아감), commit(실제 반영)이 일어나며 실제로 DB에 반영됨
 - 이를 활용하여, 대량의 쿼리를 날리는 것을 커밋 직전까지 지연시키고 모아서 처리(배치 처리) 가능.
@@ -238,6 +238,55 @@ Hibernate:
 ```
 - 실제 실행 시 구분선이 먼저 뜨고 쿼리가 날아감
 - commit 이후 실제 쿼리가 날아감을 알 수 있음
+
+</div>
+</details>
+
+---
+
+## 영속성 컨텍스트 - 변경 감지(Dirty Checking)
+
+0. 스냅샷 : JPA는 영속성 컨텍스트에 보관할 때, 최초 상태를 1차 캐시에 복사해서 저장함. 
+1. 트랜잭션을 커밋하면 엔티티 매니저 내부에서 먼저 `flush()`가 호출됨
+2. 엔티티와 1차 캐시의 스냅샷을 비교하여 변경된 엔티티를 찾는다.
+3. 변경된 엔티티가 있으면 수정 쿼리를 생성 -> 쓰기지연 SQL 저장소에 보냄
+4. flush : DB에 쿼리가 날아감
+5. commit : 데이터베이스 트랜잭션을 커밋(실제 반영)
+
+<details>
+<summary>예시 코드</summary>
+<div markdown="1">
+
+### 실험
+```java
+Member member = em.find(Member.class, 150L);
+member.setName("ZZZZZ");
+System.out.println("=======================================");
+tx.commit();
+```
+- DB에서 멤버를 찾아와서 1차 캐시에 가져옴
+- setName을 호출하여 값을 변경한다.
+- 커밋한다.
+```
+Hibernate: 
+    select
+        member0_.id as id1_0_0_,
+        member0_.name as name2_0_0_ 
+    from
+        Member member0_ 
+    where
+        member0_.id=?
+=======================================
+Hibernate: 
+    /* update
+        hellojpa.Member */ update
+            Member 
+        set
+            name=? 
+        where
+            id=?
+```
+- 트랜잭션을 커밋하면 스냅샷과 비교하여 엔티티 변경을 감지하고 update 쿼리를 작성하여 날림
 
 </div>
 </details>
