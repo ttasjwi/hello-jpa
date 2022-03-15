@@ -14,8 +14,10 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member(202L, "member202");
-            em.persist(member);
+            Member member = em.find(Member.class, 150L);
+            member.setName("AAAAAA");
+
+            em.detach(member); // 영속성 컨텍스트에서 떼어냄.
             em.flush();
             System.out.println("=======================================");
             tx.commit();

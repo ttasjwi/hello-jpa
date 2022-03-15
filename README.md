@@ -190,6 +190,9 @@ member1 == member2 ? : true
 - 1차 캐시에 저장된 동일 객체를 찾아옴.
 - 같은 캐싱된 객체를 찾아오므로 동일성이 보장된다.
 
+</div>
+</details>
+
 ---
 
 ## 영속성 컨텍스트 - 트랜잭션을 지원하는 쓰기 지연
@@ -337,6 +340,49 @@ Hibernate:
 =======================================
 ```
 - 커밋 직전에 쿼리가 날아가야하는데 flush를 강제 호출한 시점에 쿼리가 날아가서 반영됨
+
+</div>
+</details>
+
+---
+
+## 영속성 컨텍스트 - 준영속 상태(detached)
+- 영속 상태의 엔티티가, 영속성 컨텍스트에서 분리된 상태
+- 영속성 컨텍스트가 제공하는 기능을 사용하지 못 함. (DirtyChecking, ...)
+- 준영속 상태로 만드는 방법
+  - `em.detach(...)` : 특정 엔티티를 준영속 상태로 전환 
+  - `em.clear()` : 영속성 컨텍스트를 완전히 초기화
+  - `em.close()` : 영속성 컨텍스트 종료
+
+<details>
+<summary>예시 코드</summary>
+<div markdown="1">
+
+```java
+Member member = em.find(Member.class, 150L);
+member.setName("AAAAAA");
+
+em.detach(member); // 영속성 컨텍스트에서 떼어냄.
+em.flush();
+System.out.println("=======================================");
+tx.commit();
+```
+- find(...) 호출 -> 영속성 컨텍스트에 존재하지 않음 -> DB에서 찾아옴
+- member.setName(...) : 찾아온 엔티티의 상태를 변경
+- `em.detach(member)` : member을 영속성 컨텍스트의 관리대상에서 제외함
+```
+Hibernate: 
+    select
+        member0_.id as id1_0_0_,
+        member0_.name as name2_0_0_ 
+    from
+        Member member0_ 
+    where
+        member0_.id=?
+=======================================
+```
+- DB에서 엔티티를 찾아오고, 내부 프로퍼티를 변경했음.
+- 하지만 detach로 인해 영속성 컨텍스트의 관리대상에서 제외되어 update가 되지 않음
 
 </div>
 </details>
