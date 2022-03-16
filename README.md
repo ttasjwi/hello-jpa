@@ -388,3 +388,59 @@ Hibernate:
 </details>
 
 ---
+
+## 엔티티 매핑
+
+### @Entity
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+- 데이터베이스의 테이블과 매핑할 클래스
+- name 값을 통해 JPA 내부적으로 사용할 이름을 지정할 수도 있긴한데 사용하지 않는걸 권장
+- 기본생성자가 필수적(public, protected)
+- 저장 필드에 final 기입 불가
+- final, enum, interface, inner 클래스 사용 불가
+
+</div>
+</details>
+
+
+### @Table
+
+- 주로 엔티티와 매핑할 테이블 이름 지정(생략 시 엔티티 이름을 테이블 이름으로 사용)
+- name, catalog, schema, uniqueConstraints
+  - name : 매핑 테이블 이름
+  - uniqueConstraints : DDL 생성 시 제약 조건
+
+### 필드, 컬럼 매핑
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+1. `@Column` : 객체의 필드를 Column에 맵핑
+
+2. `@Enumerated` : enum을 매핑할 때 사용
+   - 주의 : 지정하지 않을 경우 value가 EnumType.ORDINAL로 지정되어버리는데 나중에 enum 변경으로 ordinal이 변경될 경우 매우 위험해진다. **반드시 EnumType.STRING을 쓰자.**
+
+3. `@Temporal` : 날짜, 시간 맵핑에 사용하는데, java 1.8 이후 추가된 LocalDate, LocalTime, LocalDateTime을 사용하면 사용할 필요가 없다.
+
+4. `@Lob` : Large Object
+   - CLOB : `VARCHAR`로도 다루기 힘든 긴 문자열을 처리할 때
+     - String, char[], java.sql.CLOB
+   - BLOB : CLOB이 아닌 모든 LOB
+     - byte[], java.sql.BLOB
+
+5. `@Transient` : DB에 매핑하지 않음(주로 임시적으로 사용하고 싶은 필드)
+   
+6. `@Access` : 엔티티의 프로퍼티에 JPA가 접근하는 방식 결정
+   - `AccessType.FIELD` : 필드에 직접 접근. 접근제어자가 private여도 접근할 수 있음.
+   - `AccessType.PROPERTY` : getter를 통해 접근
+   - 지정하지 않을 경우 `@Id`의 위치를 기준으로 접근방식이 설정됨
+
+</div>
+</details>
+
+---
+
