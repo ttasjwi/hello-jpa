@@ -7,6 +7,10 @@
 
 ## 프로젝트 설정
 
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
 - java : 11
 - 빌드 : Maven
 - 의존 라이브러리(`pom.xml`)
@@ -14,9 +18,18 @@
   - `org.hibernate:hibernate-entitymanager` : 하이버네이트 엔티티 매니저
   - `javax.xml.bind:javaxb-api` : java 11 이상 의존성 추가 해야함.
 
+</div>
+</details>
+
 ---
 
-## JPA의 구동방식
+# Section 2 - JPA 시작하기
+
+## 2.1 JPA의 구동방식
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
 
 1. 설정정보 조회
    - `META.INF/persistence.xml`에서 Persistence 조회
@@ -27,9 +40,15 @@
 3. 요청이 들어오고 나갈 때마다, EntityManager를 생성 후 버리기
    - enf.createEntityManger();
 
----
+</div>
+</details>
 
-## EntityManagerFactory, EntityManager
+## 2.2 EntityManagerFactory, EntityManager
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
 ```java
 EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
 
@@ -58,9 +77,15 @@ emf.close(); // 어플리케이션이 종료되기 전에 EntityManagerFactory�
 - EntityTransaction : 트랜잭션
   - JPA의 모든 데이터 변경은 트랜잭션 안에서 이루어져야한다.
 
----
+</div>
+</details>
 
-## JPA의 기본 CRUD
+## 2.3 JPA의 기본 CRUD
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
 
 기본적인 CRUD에 관한 메서드를 제공하는데, 데이터 변경은 트랜잭션 안에서 이루어져야한다.
 
@@ -70,9 +95,15 @@ emf.close(); // 어플리케이션이 종료되기 전에 EntityManagerFactory�
 - 수정 : `findMember.setName(...)`
   - 트랜잭션 안에서, 데이터 변경이 일어날 경우 commit 직전에 jpa가 변경 쿼리를 날려준다.
 
----
+</div>
+</details>
 
-## JPQL
+## 2.4 JPQL
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
 ```java
 em.createQuery("SELECT m from Member as m").getResultList();
 ```
@@ -82,9 +113,14 @@ em.createQuery("SELECT m from Member as m").getResultList();
 - 필요한 데이터만 DB에서 가져오려면 결국 검색조건이 포함된 SQL을 작성해야함.
 - JPA는 SQL을 추상화한 JPQL이라는 객체지향 쿼리언어를 제공함. JPQL을 통해 엔티티 중심의 쿼리를 작성하고, JPA가 각 DBMS별 방언에 맞게 쿼리를 작성하여 날려줌
 
----
+</div>
+</details>
 
-## 엔티티의 생명주기
+## 2.5 엔티티의 생명주기
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
 
 ![EntityLifeCycle.png](img/EntityLifeCycle.png)
 
@@ -99,13 +135,8 @@ em.createQuery("SELECT m from Member as m").getResultList();
 
 - 삭제 : 엔티티를 영속성 컨텍스트, DB에서 삭제
   - em.remove()
-
-
-<details>
-<summary>예시 코드</summary>
-<div markdown="1">
-
-### 실험
+  
+### 엔티티의 생명주기 - 실험
 ```java
 // 비영속
 Member member = new Member(); // new (비영속)
@@ -126,7 +157,7 @@ tx.commit();
   - persist 전, 후에 sout문을 두어, 언제 쿼리가 실행되는지 확인하기
 - 객체를 remove
 
-## 결과
+### 엔티티의 생명주기 - 결과
 
 ```
 === BEFORE ===
@@ -154,18 +185,22 @@ Hibernate:
 
 ---
 
-## 영속성 컨텍스트 -  1차 캐시, 영속 엔티티의 동일성 보장
+# Section 3. 영속성 관리 - 내부 동작 방식
+
+## 3.1 영속성 컨텍스트 1 : 1차 캐시 / 영속 엔티티의 동일성 보장
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 1차 캐시, 영속 엔티티의 동일성 보장
 
 - 영속성 컨텍스트는 엔티티를 1차 캐시에 우선적으로 저장한다.
 - key로 id, value로 엔티티를 저장함.
 - 객체를 찾아올 때 1차 캐시에서 우선적으로 조회하고 존재하면 쿼리를 날려서 찾아오지 않고 바로 1차캐시에서 가져온다.
 - 같은 캐시에서 찾아오므로 같은 영속성 컨텍스트의 동일 트랜잭션에서 관리되는 객체는 동일성(주솟값 같음)을 보장함
 
-<details>
-<summary>예시 코드</summary>
-<div markdown="1">
-
-### 실험
+### 영속성 컨텍스트 1 - 실험
 ```java
 Member member1 = em.find(Member.class, 101L);
 Member member2 = em.find(Member.class, 101L);
@@ -174,7 +209,7 @@ tx.commit();
 ```
 - 동일한 id로 EM을 통해 찾아오기 요청
 
-### 결과
+### 영속성 컨텍스트 1 - 결과
 ```
 Hibernate: 
     select
@@ -193,19 +228,21 @@ member1 == member2 ? : true
 </div>
 </details>
 
----
+## 3.2 영속성 컨텍스트 2 : 트랜잭션을 지원하는 쓰기 지연
 
-## 영속성 컨텍스트 - 트랜잭션을 지원하는 쓰기 지연
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 트랜잭션을 지원하는 쓰기 지연
 - `persist` : 영속성 컨텍스트의 1차 캐시에 저장 + 쓰기 지연 SQL 저장소에 쿼리를 저장함 
 - tx.commit() -> flush(쿼리 날아감), commit(실제 반영)이 일어나며 실제로 DB에 반영됨
 - 이를 활용하여, 대량의 쿼리를 날리는 것을 커밋 직전까지 지연시키고 모아서 처리(배치 처리) 가능.
   - 배치사이즈 조절 : `<property name="hibernate.jdbc.batch_size" value="..."/>`
 
-<details>
-<summary>예시 코드</summary>
-<div markdown="1">
 
-### 실험
+
+### 트랜잭션을 지원하는 쓰기 지연 : 실험
 ```java
             Member member1 = new Member(150L, "A");
             Member member2 = new Member(160L, "B");
@@ -219,7 +256,7 @@ member1 == member2 ? : true
 - 객체 생성 후 persist
 - sout문으로 구분선을 그어줌.
 - commit
-### 결과
+### 트랜잭션을 지원하는 쓰기 지연 : 실험결과
 ```
 =======================================
 Hibernate: 
@@ -245,10 +282,13 @@ Hibernate:
 </div>
 </details>
 
----
+## 3.3 영속성 컨텍스트 3 : 변경 감지(Dirty Checking)
 
-## 영속성 컨텍스트 - 변경 감지(Dirty Checking)
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
 
+### 변경 감지(Dirty Checking)
 0. 스냅샷
    - JPA는 영속성 컨텍스트에 보관할 때, 최초 상태를 1차 캐시에 복사해서 저장함.
 
@@ -262,11 +302,7 @@ Hibernate:
 
 2. commit : 데이터베이스 트랜잭션을 실제 커밋(실제 반영)
 
-<details>
-<summary>예시 코드</summary>
-<div markdown="1">
-
-### 실험
+### 변경 감지(Dirty Checking) - 실험
 ```java
 Member member = em.find(Member.class, 150L);
 member.setName("ZZZZZ");
@@ -276,6 +312,7 @@ tx.commit();
 - DB에서 멤버를 찾아와서 1차 캐시에 가져옴
 - setName을 호출하여 값을 변경한다.
 - 커밋한다.
+### 변경 감지(Dirty Checking) - 결과
 ```
 Hibernate: 
     select
@@ -300,9 +337,11 @@ Hibernate:
 </div>
 </details>
 
----
+## 3.4 영속성 컨텍스트 - flush()
 
-## 영속성 컨텍스트 - flush()
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
 
 1. 플러시
    - 영속성 컨텍스트의 변경 내역이 실제 DB에 반영(동기화)
@@ -316,10 +355,6 @@ Hibernate:
    - `em.setFulshMode(...)` : 거의 잘 안 씀. 웬만해선 디폴트값 쓰자.
      - FlushModeType.AUTO : 디폴트(커밋, 쿼리 실행 시 플러시)
      - FlushModeType.COMMIT : 커밋할 때만 플러시 (JPQL 실행시 flush 안 함)
-
-<details>
-<summary>예시 코드</summary>
-<div markdown="1">
 
 ```java
 Member member = new Member(202L, "member202");
@@ -344,19 +379,18 @@ Hibernate:
 </div>
 </details>
 
----
+## 3.5 영속성 컨텍스트 - 준영속 상태(detached)
 
-## 영속성 컨텍스트 - 준영속 상태(detached)
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
 - 영속 상태의 엔티티가, 영속성 컨텍스트에서 분리된 상태
 - 영속성 컨텍스트가 제공하는 기능을 사용하지 못 함. (DirtyChecking, ...)
 - 준영속 상태로 만드는 방법
   - `em.detach(...)` : 특정 엔티티를 준영속 상태로 전환 
   - `em.clear()` : 영속성 컨텍스트를 완전히 초기화
   - `em.close()` : 영속성 컨텍스트 종료
-
-<details>
-<summary>예시 코드</summary>
-<div markdown="1">
 
 ```java
 Member member = em.find(Member.class, 150L);
@@ -389,31 +423,32 @@ Hibernate:
 
 ---
 
-## 엔티티 매핑
+# Section 4. 엔티티 매핑
 
-### @Entity
+## 4.1 객체와 테이블 매핑
+
 <details>
 <summary>접기/펼치기</summary>
 <div markdown="1">
 
+### @Entity
 - 데이터베이스의 테이블과 매핑할 클래스
 - name 값을 통해 JPA 내부적으로 사용할 이름을 지정할 수도 있긴한데 사용하지 않는걸 권장
 - 기본생성자가 필수적(public, protected)
 - 저장 필드에 final 기입 불가
 - final, enum, interface, inner 클래스 사용 불가
 
-</div>
-</details>
-
-
 ### @Table
 
 - 주로 엔티티와 매핑할 테이블 이름 지정(생략 시 엔티티 이름을 테이블 이름으로 사용)
 - name, catalog, schema, uniqueConstraints
-  - name : 매핑 테이블 이름
-  - uniqueConstraints : DDL 생성 시 제약 조건
+    - name : 매핑 테이블 이름
+    - uniqueConstraints : DDL 생성 시 제약 조건
 
-### 필드, 컬럼 매핑
+</div>
+</details>
+
+## 4.2 필드, 컬럼 매핑
 
 <details>
 <summary>접기/펼치기</summary>
@@ -441,6 +476,106 @@ Hibernate:
 
 </div>
 </details>
+
+## 4.3 기본 키 매핑
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 4.3.1) 기본키 매핑 어노테이션
+- `@Id` : 기본키 지정
+- `@GeneratedValue` : 달아주면 DB가 자동으로 생성. 안 달면 수동 Id 지정해야함.
+
+### 4.3.2) 기본키 매핑 방법
+- 직접할당 : `@Id`만 사용
+- 자동생성 : `@GeneratedValue`
+  - 전략 : strategy
+    - `GenerateType.AUTO`
+    - `GenerateType.IDENTITY`
+    - `GenerateType.SEQUENCE` 
+    - `GenerateType.TABLE`
+
+### 4.3.3) AUTO 전략
+- 기본값. 데이터베이스 방언에 따라 DB 방언에 따라, 자동으로 지정된다.
+  - `oracle` : sequence
+  - ...
+
+### 4.3.4) IDENTITY 전략 : DB에 위임
+```java
+Member member = new Member();
+member.setUsername("C");
+
+System.out.println("===================================");
+em.persist(member);
+System.out.println("==================================");
+
+tx.commit();
+```
+```
+===================================
+Hibernate: 
+    /* insert hellojpa.Member
+        */ insert 
+        into
+            Member
+            (id, name) 
+        values
+            (null, ?)
+==================================
+```
+- 기본키 생성을 DB에 위임.
+- MySQL, PostgreSQL, SQL Server, DB2 등에서 사용.
+  - 예) MySQL의 AUTO_INCREMENT
+- 보통 JPA는 트랜잭션 커밋 시점에, INSERT SQL을 실행한다. 하지만 IDENTITY 전략은 em.persist() 시점에 즉시 INSERT SQL을 실행하고 DB에서 식별자를 조회한다.
+  - 엔티티가 영속상태가 되려면 식별자가 반드시 필요한데, IDENTITY 전략은 엔티티를 DB에 저장해야 식별자를 구할 수 있기 때문
+- 벌크 INSERT에는 불리 (매 INSERT마다 DB와 통신해야함)
+
+### 4.3.5) SEQUENCE 전략 
+- 유일한 값을 순서대로 생성하는 특별한 오브젝트를 사용
+- Oracle, PostgreSQL, DB2, H2에서 사용 가능(MySQL은 Sequence기능이 별도로 존재하지 않음)
+- `@SequenceGenerator` : id 식별자값을 할당하는 시퀀스 생성기
+  - `name` : sequenceGenerator의 이름이 값을 `@GeneratedValue`의 generator 속성에 넣어줘야함.
+  - `sequenceName` : 매핑할 데이터베이스 Sequence 이름(실제 DB의 Sequence명을 매핑해야함)
+  - `initialValue` : 시퀀스 DDL 생성시에만 사용하는 옵션. 처음 DDL 생성시 처음 시작하는 수를 지정
+  - `allocationSize` : 시퀀스 한번 호출에 증가하는 숫자. (기본값 50)
+    - 설정한 값만큼 한번에 시퀀스 값을 증가
+    - 이 값만큼 메모리에서 식별자를 할당
+    - 50을 넘어 51이 되면 시퀀스 값을 100으로 증가시키고 51~100까지 메모리에서 식별자 할당
+  - `catalog`, `schema` : 데이터베이스 catalog, schema 이름 
+
+### 4.3.6) TABLE 전략
+- 키 생성 전용 테이블을 하나 마 들어서 데이터베이스 시퀀스를 흉내내는 전략
+  - 장점 : 모든 DB에 적용 가능
+  - 단점 : 성능
+    - 값을 조회하면서 SELECT 쿼리를 사용하고, 다음 값으로 증가시키기 위해 update 쿼리를 또 날려야함.
+    - SEQUENCE 전략에 비했을 때 DB와 한번 더 통신함.
+- `@TableGenerator`
+  - `name` : 식별자 생성기 이름
+  - `table` : 키 생성 테이블명
+  - `pkColumnName` : 시퀀스 칼럼명
+  - `valueColumnNa` : 시퀀스 값 칼럼명
+  - `pkColumnValue` : 키로 사용할 이름
+  - `initialValue` : 초기값, 마지막으로 생성된 값이 기준 (기본값 0)
+  - `allocationSize` : 시퀀스 한번 호출에 증가하는 수. (기본값 50)
+  - `catalog` : 데이터베이스 catalog, schema 이름
+  - `uniqueConstraints` : 유니크 제약 조건을 지정
+
+### 4.3.7) 권장 식별자 전략
+- 기본 키 제약조건 : not null, 유일, **변하면 안 된다.**
+- 보통 위의 제약조건을 만족하는 자연키는 찾기 매우 힘듬. 대리키(대체키)를 사용하는 것이 좋다.
+  - 자연키(Natural Key) : 비즈니스 모델에서 자연스레 나오는 속성으로 기본키를 정함 (회원로그인 아이디 등)
+  - 대리키(Surrogate key, 인조키) : 인공적이거나 합성적인 키. MySQL의 AutoIncrement 등으로 자동적으로 생성된 키가 이에 해당.
+- 비즈니스 로직에 깊게 얽혀있는 키는 미래에 변경 가능성이 있을 수 있다. 기본키로 사용하지 적절하지 않음.
+  - 예) 주민등록번호, 회원 로그인 아이디, ...
+- 권장
+  - AutoIncrement / Sequence Object
+  - UUID
+  - 키 생성전략
+     
+</div>
+</details>
+
 
 ---
 
