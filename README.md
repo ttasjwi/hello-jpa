@@ -576,6 +576,34 @@ Hibernate:
 </div>
 </details>
 
+---
+
+# Section 5. 연관관계 매핑
+
+## 5.1) 단방향 연관관계
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 5.1.1) 테이블 중심 객체설계의 문제점
+객체를 테이블에 맞추어 데이터 중심으로 모델링하면 협력 관계를 만들 수 없다.
+- 테이블 : 외래키를 조인을 사용해서 연관된 테이블을 찾는다.
+- 객체 : 참조를 사용해서 연관된 객체를 찾는다.
+
+### 5.1.2) 단방향 연관관계
+```java
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+```
+- `@ManyToOne` : 다대일 관계라는 매핑정보.
+  - (참고) : 일대다(OneToMany), 일대일(OneToOne) 관계도 존재
+- `@JoinColumn`: 외래키 맵핑할 때 사용.
+  - name : 매핑할 외래키
+
+</div>
+</details>
 
 ---
 
