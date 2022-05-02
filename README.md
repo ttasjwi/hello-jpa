@@ -625,5 +625,34 @@ Hibernate:
 - 외래키가 있는 곳을 연관관계의 주인으로 한다.
   - 반대편은 읽기만 가능하고, 외래키를 변경하지 못 함.
 
+### 5.2.3) 양방향 연관관계 - 주의
+```java
+      Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
+
+            Member member = new Member();
+            member.setName("member1");
+            member.setTeam(team);
+            em.persist(member);
+
+//            em.flush();
+//            em.clear();
+
+
+            Member findMember = em.find(Member.class, member.getId());
+            List<Member> members = findMember.getTeam().getMembers(); //  // 1차 캐시에 보관된 team이 찾아짐
+            System.out.println("=============================");
+            for (Member m : members) {
+                System.out.println("m = "+m.getName()); // 하지만 team 입장에서 멤버를 찾아보면 멤버가 없음.
+            }
+            System.out.println("=============================");
+            tx.commit();
+```
+- 연관관계의 주인에 값을 입력해야 실제 쿼리가 날려질 때 반영됨.
+  - 가짜 매핑(주인의 반대편)에서만 연관관계를 설정하면 반영되지 않는다.
+- 객체지향적 설계를 고려했을 때는(코드 상의 완결성 관점에서) 자바 코드에서 양쪽 다 값을 입력하는게 맞다.
+  - 연관관계 편의 메서드를 활용하자. (변경은 연관관계의 주인에서.)
+
 ---
 
