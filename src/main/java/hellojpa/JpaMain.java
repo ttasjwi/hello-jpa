@@ -18,22 +18,15 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Team team = new Team();
-            team.setName("TeamA");
-            em.persist(team);
-
             Member member = new Member();
             member.setName("member1");
-            member.changeTeam(team); // 팀을 셋팅하는 쪽에서 단순히 프로퍼티 값만 변경하지 않고 역방향에도 반영.(편의 메서드)
             em.persist(member);
 
-            Member findMember = em.find(Member.class, member.getId());
-            List<Member> members = findMember.getTeam().getMembers(); //  // 1차 캐시에 보관된 team이 찾아짐
-            System.out.println("=============================");
-            for (Member m : members) {
-                System.out.println("m = "+m.getName()); // members에서 제대로 멤버가 찾아짐
-            }
-            System.out.println("=============================");
+            Team team = new Team();
+            team.setName("teamA");
+            team.getMembers().add(member);
+            em.persist(team);
+
             tx.commit();
         } catch(Exception e) {
             tx.rollback();

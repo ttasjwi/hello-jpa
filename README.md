@@ -735,6 +735,38 @@ Hibernate:
 
 ## 6.3 일대다(1:N)
 
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 6.3.1) 일대다 - 단방향 매핑
+```java
+@OneToMany
+@JoinColumn(name = "team_id")
+private List<Member> members = new ArrayList<>();
+```
+- DB : 외래키를 다쪽에서 관리하는건 같음.
+- '일'쪽을 연관관계의 주인으로 할 때는 `@JoinColumn`을 사용
+- 컬렉션의 요소가 변경될 경우, UPDATE 쿼리가 날아감
+- JoinColumn을 두지 않을 경우 조인테이블(중간에 테이블을 하나 추가함) 방식 사용
+
+### 6.3.2) 일대다 - 양방향 연관관계
+```java
+@ManyToOne
+@JoinColumn(name = "team_id", insertable = false, updatable = false)
+private Team team;
+```
+- '다'쪽에 `@JoinColumn`을 둠
+- 읽기전용으로 설정 (`insertable=false`,`updateable = false`)
+
+### 6.3.3) 일대다 - 단점
+- 엔티티가 관리하는 외래키가 다른 테이블에 있음.
+- 연관관계를 위해 추가로 UPDATE 쿼리 실행
+- 양방향을 쓰려거든 차라리 다대일 양방향을 사용하는 것 낫다.
+
+</div>
+</details>
+
 ## 6.4 일대일(1:1)
 
 ## 6.5 다대다(M:N)
