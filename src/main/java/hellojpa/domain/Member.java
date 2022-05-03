@@ -1,6 +1,8 @@
 package hellojpa.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Member {
@@ -17,6 +19,9 @@ public class Member {
     @OneToOne
     @JoinColumn(name = "locker_id")
     private Locker locker;
+
+    @OneToMany(mappedBy = "member")
+    private List<Order> orders = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -48,5 +53,13 @@ public class Member {
 
     public void setLocker(Locker locker) {
         this.locker = locker;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }
