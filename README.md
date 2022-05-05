@@ -922,4 +922,27 @@ private Team team;
 </div>
 </details>
 
+## 7.2 `@MappedSuperclass` - 매핑 정보 상속
+- 엔티티가 아님. 테이블과 매핑하는 용도의 클래스가 아님.
+- 상속관계를 매핑하는 것이 아님.
+- 여러 entity들에게 공통의 속성을 가지게 하고 싶을 때 사용
+  - 자손 클래스들에는 매핑 정보만 제공함.
+  - 상위 클래스의 테이블은 생성되지 않음
+- 조회 불가. em.find(BaseEntity) 불가
+- 직접 생성해서 사용할 일이 없으므로 추상 클래스 권장
+
+### `@MappedSuperclass`
+```java
+@MappedSuperclass
+public class BaseEntity {
+
+    private String createdBy;
+    private LocalDateTime createdDate;
+    private String lastModifiedBy;
+    private LocalDateTime lastModifiedDate;
+```
+- 테이블과 관계 없고, 단순히 엔티티가 공통적으로 사용하는 맵핑정보를 모으는 역할
+- 주로 등록일, 수정일, 등록자, 수정자 같은 전체 엔티티에서 공통으로 적용하는 정보를 모을 때 사용
+- 참고 : `@Entity` 클래스는 엔티티나 `@MappedSuperclass`로 지정한 클래스만 상속 가능
+
 ---
