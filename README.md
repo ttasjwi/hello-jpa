@@ -1094,3 +1094,57 @@ Hibernate:
 
 </div>
 </details>
+
+## 8.3 영속성 전이(CASCADE)와 고아 객체
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+
+### 8.3.1 영속성 전이(CASCADE)
+- 특정 엔티티를 영속 상태로 만들 때, 연관된 엔티티도 함께 영속상태로 만들고 싶은 경우.
+  - 예) 부모1, 자손2을 등록할 때 부모 등록, 자손 등록 2번을 해야함. 이를 한 번에 할 수 없을까?
+
+### 8.3.2 영속성 전이 - 주의점
+- 영속성 전이는 연관관계를 매핑하는 것과 아무런 관련이 없다.
+- 엔티티를 영속화할 때 연관된 엔티티도 함께 영속화하는 편리함을 제공하는 용도
+
+### 8.3.3 CASCADE의 종류
+- **ALL**
+- **PERSIST**
+  - 저장 : 부모와 연관된 자식들도 모두 영속화
+- **REMOVE**
+  - 삭제 : 부모 엔티티를 삭제하면 자식 엔티티들도 함께 삭제
+- MERGE : 병합
+- REFRESH
+- DETACH
+
+### 8.3.4 고아객체
+```java
+Parent findParent = em.find(Parent.class, parent.getId());
+findParent.getChilds().remove(0);
+```
+- 고아객체 제거 : 부모 엔티티와 연관관계가 끊어진 자식 엔티티를 자동으로 삭제하는 기능
+  - `orphanRemoval = true, false` : true일 때 고아객체 자동 삭제
+- 부모 객체의 컬렉션에서 자손을 제거할 때, delete 쿼리 날아감
+
+### 8.3.5 고아객체 - 주의
+- 참조가 제거된 엔티티는 다른 곳에서 참조하지 않는 고아 객체로 보고, 삭제하는 기능
+- 참조하는 곳이 하나일 때 또는 특정 엔티티가 개인 소유할 때 사용 (라이프 사이클이 거의 비슷한 상황)
+  - 여러 parent들이 child를 소유하는 경우에는 고아객체 삭제 옵션을 두거나, cascade 걸어두면 위험하다.
+- `@OneToOne`, `@OneToMany`만 사용 가능.
+- 참고 : 개념적으로 부모를 제거(`em.remove(parent)`)하면 자식은 고아가 된다. 고아객체 삭제기능을 사용하면, 부모가 제거될 때 자식도 제거된다. 이는 CascadeType.REMOVE 처럼 동작한다.
+
+### 8.3.6 영속성 전이 + 고아 객체, 생명주기
+- `CASCADEType.ALL + orphanRemoval = true`
+- 스스로 생명주기를 관리하는 엔티티는 `em.persist()`로 영속화, `em.remove()`로 제거
+- 두 옵션을 모두 활성화하면 부모 엔티티를 통해서 자식의 생명 주기를 모두 관리할 수 있다.
+  - 부모 Repository만 만들고 자식 엔티티의 생명주기는 부모를 통해서 관리
+- 도메인 주도 설계(Domain-driven design, DDD)의 Aggregate Root 개념을 구현할 때 유용
+
+</div>
+</details>
+
+---
+

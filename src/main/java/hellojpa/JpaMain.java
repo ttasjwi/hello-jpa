@@ -1,13 +1,12 @@
 package hellojpa;
 
-import hellojpa.domain.Member;
-import hellojpa.domain.Team;
+import hellojpa.domain.Child;
+import hellojpa.domain.Parent;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -18,28 +17,20 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Team teamA = new Team();
-            teamA.setName("teamA");
-            em.persist(teamA);
+            Parent parent = new Parent();
+            Child child1 = new Child();
+            Child child2= new Child();
 
-            Team teamB = new Team();
-            teamB.setName("teamB");
-            em.persist(teamB);
+            parent.addChild(child1);
+            parent.addChild(child2);
 
-            Member memberA = new Member();
-            memberA.setTeam(teamA);
-            em.persist(memberA);
-
-            Member memberB = new Member();
-            memberB.setTeam(teamB);
-            em.persist(memberB);
+            em.persist(parent);
 
             em.flush();
             em.clear();
 
-            List<Member> members =
-                    em.createQuery("select m from Member as m", Member.class)
-                    .getResultList();
+            Parent findParent = em.find(Parent.class, parent.getId());
+            findParent.getChilds().remove(0);
 
             tx.commit();
         } catch(Exception e) {
