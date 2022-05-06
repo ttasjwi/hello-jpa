@@ -1,6 +1,8 @@
 package hellojpa;
 
+import hellojpa.domain.Address;
 import hellojpa.domain.Child;
+import hellojpa.domain.Member;
 import hellojpa.domain.Parent;
 
 import javax.persistence.EntityManager;
@@ -17,20 +19,19 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Parent parent = new Parent();
-            Child child1 = new Child();
-            Child child2= new Child();
+            Address address = new Address("city", "street","30303");
 
-            parent.addChild(child1);
-            parent.addChild(child2);
+            Member memberA = new Member();
+            memberA.setName("memberA");
+            memberA.setHomeAddress(address);
+            em.persist(memberA);
 
-            em.persist(parent);
+            Member memberB = new Member();
+            memberB.setName("memberB");
+            memberB.setHomeAddress(address);
+            em.persist(memberB);
 
-            em.flush();
-            em.clear();
-
-            Parent findParent = em.find(Parent.class, parent.getId());
-            findParent.getChilds().remove(0);
+            memberA.getHomeAddress().setCity("newCity");
 
             tx.commit();
         } catch(Exception e) {
