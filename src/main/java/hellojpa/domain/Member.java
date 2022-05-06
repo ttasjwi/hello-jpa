@@ -1,6 +1,7 @@
 package hellojpa.domain;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,15 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
+
+    //period
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+
+    //주소
+    private String city;
+    private String street;
+    private String zipcode;
 
     public Long getId() {
         return id;
