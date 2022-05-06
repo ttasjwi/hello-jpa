@@ -19,19 +19,19 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Address address = new Address("city", "street","30303");
+            Address addressA = new Address("city", "street","30303");
 
             Member memberA = new Member();
             memberA.setName("memberA");
-            memberA.setHomeAddress(address);
+            memberA.setHomeAddress(addressA);
             em.persist(memberA);
+
+            Address addressB = new Address("newCity", addressA.getStreet(), addressA.getZipcode());
 
             Member memberB = new Member();
             memberB.setName("memberB");
-            memberB.setHomeAddress(address);
+            memberB.setHomeAddress(addressB);
             em.persist(memberB);
-
-            memberA.getHomeAddress().setCity("newCity");
 
             tx.commit();
         } catch(Exception e) {
