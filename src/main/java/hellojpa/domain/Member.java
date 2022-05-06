@@ -1,7 +1,6 @@
 package hellojpa.domain;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +20,19 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
-    //period
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    @Embedded
+    private Period workPeriod;
 
-    //주소
-    private String city;
-    private String street;
-    private String zipcode;
+    @Embedded
+    private Address homeAddress;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city", column = @Column(name = "company_city")),
+            @AttributeOverride(name = "street", column = @Column(name = "company_street")),
+            @AttributeOverride(name = "zipcode", column = @Column(name = "company_zipcode"))
+    })
+    private Address companyAddress;
 
     public Long getId() {
         return id;
@@ -60,5 +64,29 @@ public class Member extends BaseEntity {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public Period getWorkPeriod() {
+        return workPeriod;
+    }
+
+    public void setWorkPeriod(Period workPeriod) {
+        this.workPeriod = workPeriod;
+    }
+
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    public Address getCompanyAddress() {
+        return companyAddress;
+    }
+
+    public void setCompanyAddress(Address companyAddress) {
+        this.companyAddress = companyAddress;
     }
 }

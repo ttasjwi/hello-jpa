@@ -1188,4 +1188,64 @@ findParent.getChilds().remove(0);
 </div>
 </details>
 
+## 9.2 임베디드 타입(복합 값 타입)
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+
+### 9.2.1 임베디드 타입
+- 새로운 값 타입을 직접 정의
+- JPA는 이를 임베디드 타입(embedded Type)이라 함.
+- 주로 기본 값 타입을 모아서 만들어서 복합 값 타입이라고 함
+- int, String과 같은 값 타입.
+
+### 9.2.2 임베디드 타입 사용법
+```java
+@Embedded
+private Period workPeriod;
+
+@Embedded
+private Address homeAddress;
+```
+- `@Embeddable` : 값 타입을 정의하는 곳에 표시
+- `@Embedded` : 값 타입을 사용하는 곳에 표시
+- 기본 생성자 필수
+
+### 9.2.3 임베디드 타입의 장점
+- 재사용, 높은 응집도
+- 내부적으로 자율적인 행동을 부여할 수 있음. (비즈니스 로직)
+- 임베디드 타입을 포함한 모든 값 타입은, 값 타입을 소유한 엔티티에 생명주기를 의존함
+
+### 9.2.4 임베디드 타입과 테이블 매핑
+- 임베디드 타입은 엔티티의 값일 뿐이다.
+- 임베디드 타입을 사용하기 전과 후에 매핑하는 테이블은 같다.
+- 객체와 테이블을 아주 세밀하게 매핑하는 것이 가능.(의미있는 단위로 객체를 분리)
+- 잘 설계한 ORM 애플리케이션은 매핑한 테이블의 수보다 클래스의 수가 더 많음
+
+### 9.2.5 임베디드 타입과 연관관계
+- 하나의 엔티티는 여러개의 임베디드 타입을 포함할 수 있다.
+- 하나의 임베디드 타입은 다른 임베디드 타입을 포함할 수 있다.
+- 하나의 임베디드 타입은 다른 엔티티 타입을 포함할 수 있다.
+
+### 9.2.6 `@AttributeOverride` : 속성 재정의
+```java
+@Embedded
+@AttributeOverrides({
+        @AttributeOverride(name = "city", column = @Column(name = "company_city")),
+        @AttributeOverride(name = "street", column = @Column(name = "company_street")),
+        @AttributeOverride(name = "zipcode", column = @Column(name = "company_zipcode"))
+})
+private Address companyAddress;
+```
+- 한 엔티티에서 같은 값 타입을 사용하면 -> 칼럼 명이 중복되는 문제 발생
+- `@AttributeOverrides`, `@AttributeOverride`을 사용해서 칼럼명 속성을 재정의
+
+### 9.2.7 임베디드 타입과 null
+- 임베디드 타입의 값이 null이면 매핑한 칼럼 값은 모두 null
+
+</div>
+</details>
+
 ---
