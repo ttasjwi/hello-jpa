@@ -1,12 +1,13 @@
 package hellojpa;
 
 import hellojpa.domain.Member;
+import hellojpa.domain.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.time.LocalDateTime;
+import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -17,22 +18,28 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            member.setName("user1");
-            member.setCreatedBy("kim");
-            member.setCreatedDate(LocalDateTime.now());
-            em.persist(member);
+            Team teamA = new Team();
+            teamA.setName("teamA");
+            em.persist(teamA);
+
+            Team teamB = new Team();
+            teamB.setName("teamB");
+            em.persist(teamB);
+
+            Member memberA = new Member();
+            memberA.setTeam(teamA);
+            em.persist(memberA);
+
+            Member memberB = new Member();
+            memberB.setTeam(teamB);
+            em.persist(memberB);
+
             em.flush();
             em.clear();
 
-
-            Member refMember = em.getReference(Member.class, member.getId());
-            System.out.println("refMember.class = " + refMember.getClass());
-            em.clear();
-            Member findMember = em.find(Member.class, member.getId());
-            System.out.println("findMember.classs = " + findMember.getClass());
-
-            System.out.println("(refMember == findMember) : " + (refMember == findMember));
+            List<Member> members =
+                    em.createQuery("select m from Member as m", Member.class)
+                    .getResultList();
 
             tx.commit();
         } catch(Exception e) {

@@ -1020,4 +1020,77 @@ refMember.class = class hellojpa.domain.Member$HibernateProxy$8zLDrlOX
 </div>
 </details>
 
----
+## 8.2 즉시 로딩과 지연 로딩
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 8.2.1 지연 로딩
+```java
+@ManyToOne(fetch = FetchType.LAZY)
+```
+- 영속성 컨텍스트에서 엔티티를 찾아올 때, 엔티티가 참조하는 다른 엔티티를 프록시로 가져옴
+  - 메서드 호출 또는 강제 초기화 시, 초기화(쿼리 날아감)
+
+### 8.2.2 즉시 로딩
+```java
+@ManyToOne(fetch = FetchType.EAGER)
+```
+- 영속성 컨텍스트에서 엔티티를 찾아올 때, 엔티티가 참조하는 다른 엔티티를 한번에 조인해서 가져옴
+- JPA 구현체는 가능하면 조인을 사용해서 SQL 한번에 함께 조회
+- 즉시로딩은 JPQL 이용시, 쿼리 여러방이 날아감.
+
+### 8.2.3 프록시와 즉시로딩 주의
+- 가급적 지연 로딩만 사용(특히 실무에선 지연 로딩만 사용해야함)
+- 즉시 로딩을 적용하면 예상치 못 한 SQL이 발생한다.
+- 즉시 로딩은 JPQL에서 N+1 문제를 발생시킨다.
+  - 최초쿼리, 추가쿼리 N개
+- `@ManyToOne`, `@OneToOne`은 기본이 즉시 로딩이다.
+  - LAZY로 설정할 것!!!
+- `@OneToMany`, `@ManyToMany`는 기본이 지연 로딩이다.
+
+### 8.2.4 지연로딩 - 이론적
+- 함께 자주 사용하는 연관관계는 즉시로딩
+- 가끔 사용하는 연관관계는 지연로딩
+
+### 8.2.5 지연로딩 활용 - 실무
+```
+Hibernate: 
+    /* select
+        m 
+    from
+        Member as m */ select
+            member0_.member_id as member_i1_3_,
+            member0_.createdBy as createdB2_3_,
+            member0_.createdDate as createdD3_3_,
+            member0_.lastModifiedBy as lastModi4_3_,
+            member0_.lastModifiedDate as lastModi5_3_,
+            member0_.name as name6_3_,
+            member0_.team_id as team_id7_3_ 
+        from
+            member member0_
+Hibernate: 
+    select
+        team0_.team_id as team_id1_7_0_,
+        team0_.name as name2_7_0_ 
+    from
+        team team0_ 
+    where
+        team0_.team_id=?
+Hibernate: 
+    select
+        team0_.team_id as team_id1_7_0_,
+        team0_.name as name2_7_0_ 
+    from
+        team team0_ 
+    where
+        team0_.team_id=?
+```
+- 모든 연관관계에 지연 로딩을 사용해라!
+- 실무에서 즉시 로딩을 사용하지 마라!
+- JPQL fetch 조인이나 엔티티 그래프 기능을 사용해라!
+- 즉시 로딩은 상상하지 못 한 쿼리가 나간다! (위의 경우 한 번에 3번의 쿼리가 날아감...)
+
+</div>
+</details>

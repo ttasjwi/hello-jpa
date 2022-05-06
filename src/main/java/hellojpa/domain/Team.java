@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name="team")
 public class Team {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,8 +13,7 @@ public class Team {
     private Long id;
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "team_id")
+    @OneToMany(mappedBy = "team")
     private List<Member> members = new ArrayList<>();
 
     public Long getId() {
