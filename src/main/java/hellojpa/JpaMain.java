@@ -22,6 +22,17 @@ public class JpaMain {
             member.setCreatedBy("kim");
             member.setCreatedDate(LocalDateTime.now());
             em.persist(member);
+            em.flush();
+            em.clear();
+
+
+            Member refMember = em.getReference(Member.class, member.getId());
+            System.out.println("refMember.class = " + refMember.getClass());
+            em.clear();
+            Member findMember = em.find(Member.class, member.getId());
+            System.out.println("findMember.classs = " + findMember.getClass());
+
+            System.out.println("(refMember == findMember) : " + (refMember == findMember));
 
             tx.commit();
         } catch(Exception e) {
