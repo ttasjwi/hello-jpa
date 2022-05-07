@@ -1640,4 +1640,35 @@ List<Member> members = em.createQuery("SELECT m FROM Member as m ORDER BY m.age 
 </div>
 </details>
 
+## 10.5 조인
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 10.5.1 조인의 종류
+1. 내부 조인(Inner Join)
+> SELECT m FROM Member as m [inner] JOIN m.team as t
+- m의 team_id와 같은 pk를 가진 Team 엔티티를 가져와라.
+- team이 없는 경우 가져와지지 않음
+
+2. 외부 조인(Outer Join)
+> SELECT m FROM Member m LEFT [OUTER] JOIN m.team as t
+- m의 team_id와 같은 pk를 가진 Team 엔티티뿐만 아니라 team이 없는 엔티티를 가져와라.
+
+3. 세타 조인(Theta Join)
+> SELECT count(m) FROM Member as m, Team as t WHERE m.name = t.name
+- 전혀 연관관계 없는 테이블을 곱집합 연산으로 싹 가져올 때
+
+### 10.5.2 ON절을 활용한 조인(JPA 2.1부터)
+1. 조인 대상 필터링
+   - 예) 회원과 팀을 조인하면서 팀 이름이 A인 팀만 조인
+     - SELECT m FROM Member as m LEFT JOIN m.team as t ON t.name = 'A';
+2. 연관관계가 전혀 없는 엔티리를 외부조인(하이버네이트 5.1부터)
+   - 예) 회원의 이름과, 팀의 이름이 같은 대상 외부 조인
+     - SELECT m FROM Member as m LEFT JOIN Team as t ON m.name = t.name
+
+</div>
+</details>
+
 ---
