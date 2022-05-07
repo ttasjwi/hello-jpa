@@ -1618,5 +1618,26 @@ for (MemberDTO memberDTO : memberDTOs) {
 </div>
 </details>
 
----
+## 10.4 페이징
 
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+```java
+List<Member> members = em.createQuery("SELECT m FROM Member as m ORDER BY m.age desc")
+    .setFirstResult(10)
+    .setMaxResults(10)
+    .getResultList();
+```
+1. JPA는  페이징을 다음 두가지 API로 추상화한다.
+   - setFirstResult(int startPosition) : 조회 시작 위치
+     - 0부터 시작한다.
+   - setMaxResults(int maxResult) : 조회할 데이터 수
+
+2. 페이징을 목적으로 한다면 순서가 필요할텐데, JPQL에서 ORDER BY로 정렬 기준을 부여해야함
+
+</div>
+</details>
+
+---
