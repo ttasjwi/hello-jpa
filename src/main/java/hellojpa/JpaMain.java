@@ -1,9 +1,8 @@
 package hellojpa;
 
 import hellojpa.domain.Address;
-import hellojpa.domain.Child;
+import hellojpa.domain.AddressEntity;
 import hellojpa.domain.Member;
-import hellojpa.domain.Parent;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -19,19 +18,22 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Address addressA = new Address("city", "street","30303");
+            Member member = new Member();
+            member.setName("member");
+            member.setHomeAddress(new Address("city", "street", "zipcode"));
 
-            Member memberA = new Member();
-            memberA.setName("memberA");
-            memberA.setHomeAddress(addressA);
-            em.persist(memberA);
+            member.getFavoriteFoods().add("피자");
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("삼겹살");
 
-            Address addressB = new Address("newCity", addressA.getStreet(), addressA.getZipcode());
+            member.getAddressHistory().add(new AddressEntity("oldCity1", "street", "oldZipcode1"));
+            member.getAddressHistory().add(new AddressEntity("oldCity2", "street", "oldZipcode2"));
 
-            Member memberB = new Member();
-            memberB.setName("memberB");
-            memberB.setHomeAddress(addressB);
-            em.persist(memberB);
+            em.persist(member);
+            em.flush();
+            em.clear();
+
+            Member findMember = em.find(Member.class, member.getId());
 
             tx.commit();
         } catch(Exception e) {

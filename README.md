@@ -1322,4 +1322,109 @@ b.setCity("New");
 </div>
 </details>
 
+## 9.5 값 타입 컬렉션
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 9.5.1 값 타입 컬렉션
+```java
+@ElementCollection
+@CollectionTable(
+        name = "favorite_food",
+        joinColumns = @JoinColumn(name = "member_id"))
+@Column(name = "food_name")
+private Set<String> favoriteFoods = new HashSet<>();
+```
+- 값 타입을 하나 이상 저장할 때 사용
+- 데이터베이스는 컬렉션을 같은 테이블에 저장할 수 없다.
+- 컬렉션을 저장하기 위한 별도의 테이블이 필요
+- `@ElementCollection`, `@CollectionTable`사용
+  - `@ElementCollection` : 값타입 컬렉션 선언
+  - `@CollectionTable` : 값 타입 컬렉션을 저장할 테이블 정의
+    - name : 테이블명
+    - joinColumn : 컬렉션 테이블에서 FK로 사용할 속성
+  - `@Column(name = "...")` : 컬렉션 테이블에서 사용할 속성명
+
+### 9.5.2 값 타입 컬렉션 CRUD
+- 저장 : 값타입 컬렉션에 값타입 인스턴스를 추가하면 DB에 반영됨
+  - 예) `member.getFavoriteFoods().add("치킨")`;
+- 조회 : 기본적으로 지연로딩 전략을 사용함.
+- 삭제 : 값타입 컬렉션에서 인스턴스를 삭제
+  - 주의사항 : 값 타입에 대한 equals, hashcode를 적절히 정의해야 remove 메서드에서 동등성을 기준으로 인스턴스를 제거할 수 있음
+  - 예) `member.getAddressHistory().remove(new Address("city", "street", "zipcode"))`
+- 수정 : 값타입은 식별자 개념이 없기 때문에 추적이 어려움. 삭제 후 새로 삽입하는 식으로 처리
+- 참고사항
+  - 값 타입 컬렉션은 영속성 전이(`Cascade = ALL`), 고아 객체 제거 기능(`OrphanRemoval = true`)을 필수로 가진다고 볼 수 있음.
+
+### 9.5.3 값 타입 컬렉션의 제약사항
+- 값 타입은 엔티티와 다르게 식별자 개념이 없다.
+- 값은 변경하면 추적이 어렵다.
+- 값 타입 컬렉션에 변경 사항이 발생하면, 주인 엔티티와 연관된 모든 데이터를 삭제하고, 값 타입 컬렉션에 있는 현재 값을 모두 다시 저장한다.
+  - 부분이 변경되도 싹 지우고 다시 Insert하는 점에서 성능상의 문제를 야기시킬 수 있다.
+- 값 타입 컬렉션을 매핑하는 테이블은 모든 칼럼을 묶어서 기본키를 구성해야한다.
+  - 모든 칼럼 - PK
+  - 외래키 - PK, FK
+  - null 입력을 허용하지 않아야함.
+  - 중복저장 허용하지 않도록 하기
+- `@OrderColumn` 어노테이션을 사용하면 컬렉션 내에서의 순서값도 저장할 수 있긴 한데 실무에서 사용하기는 추천하지 않는다.
+
+### 9.5.4 값 타입 컬렉션 대안
+```java
+@Entity
+@Table(name = "address")
+public class AddressEntity {
+
+    @Id @GeneratedValue
+    @Column(name = "address_id")
+    private Long id;
+
+    @Embedded
+    private Address address;
+```
+```java
+    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @JoinColumn(name = "member_id")
+    private List<AddressEntity> addressHistory = new ArrayList<>();
+```
+
+- 실무에서는 상황에 따라 값 타입 컬렉션 대신에 **일대다 관계**를 고려
+- 값타입 컬렉션은 정말 단순한 상황에서만 사용
+- 일대다 관계를 위한 엔티티를 만들고, 여기에서 값 타입을 사용
+- 영속성 전이(cascade) + 고아객체 제거를 사용해서 값 타입 컬렉션처럼 사용
+- 예시
+  - Address를 값타입으로 포함한 AddressEntity 클래스
+
+</div>
+</details>
+
+## 9.6 값 타입 정리
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 엔티티 타입의 특징
+- 식별자 있다
+- JPA를 통해 생명 주기 관리
+  - `객체 - 영속성 컨텍스트 - DB`
+- 공유 가능
+
+### 값 타입의 특징
+- 식별자 없다.
+- 생명주기를 엔티티에 의존
+  - 엔티티가 제거되면 제거됨
+- 공유하지 않는 것이 안전(새로운 인스턴스로 복사해서 사용하자)
+- 불변 객체로 만드는 것이 안전 (Setter 두지 말기)
+
+### 값 타입 주의점
+- 값 타입은 정말 값 타입이라 판단될 때만 사용
+- 엔티티와 값 타입을 혼동해서 엔티티를 값 타입으로 만들면 안 됨.
+- 식별자가 필요하고, 지속해서 값을 추적/변경 해야한다면, 그것은 값 타입이 아닌 엔티티
+  - 로직이 복잡해지면 값 타입으로 쓰지 말고 엔티티 타입으로 사용하자.
+
+</div>
+</details>
+
 ---

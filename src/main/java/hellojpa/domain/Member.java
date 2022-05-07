@@ -2,7 +2,11 @@ package hellojpa.domain;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static javax.persistence.CascadeType.*;
 
 @Entity
 @Table(name = "member")
@@ -25,6 +29,17 @@ public class Member extends BaseEntity {
 
     @Embedded
     private Address homeAddress;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "favorite_food",
+            joinColumns = @JoinColumn(name = "member_id"))
+    @Column(name = "food_name")
+    private Set<String> favoriteFoods = new HashSet<>();
+
+    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @JoinColumn(name = "member_id")
+    private List<AddressEntity> addressHistory = new ArrayList<>();
 
     @Embedded
     @AttributeOverrides({
@@ -88,5 +103,21 @@ public class Member extends BaseEntity {
 
     public void setCompanyAddress(Address companyAddress) {
         this.companyAddress = companyAddress;
+    }
+
+    public Set<String> getFavoriteFoods() {
+        return favoriteFoods;
+    }
+
+    public void setFavoriteFoods(Set<String> favoriteFoods) {
+        this.favoriteFoods = favoriteFoods;
+    }
+
+    public List<AddressEntity> getAddressHistory() {
+        return addressHistory;
+    }
+
+    public void setAddressHistory(List<AddressEntity> addressHistory) {
+        this.addressHistory = addressHistory;
     }
 }
