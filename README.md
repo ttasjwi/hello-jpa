@@ -1500,5 +1500,79 @@ List<Member> resultList = em.createNativeQuery(sql, Member.class).getResultList(
 </div>
 </details>
 
+## 10.2 JPQL 기본 문법과 기능
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+
+### 10.2.1 JPQL 소개
+- JPQL은 객체지향 쿼리 언어이다. 테이블을 대상으로 쿼리하는 것이 아니라 엔티티 객체를 대상으로 쿼리
+- JPQL은 SQL을 추상화함. 특정 데이터베이스 SQL에 의존하지 않는다.
+- JPQL은 결국 SQL로 번역된다. 번역된 SQL이 DB에 날아감
+
+### 10.2.2 JPQL 문법 - 구조
+- SELECT문
+  ```sql
+  SELECT ...
+  FROM ...
+  [WHERE] ... -- 조건
+  [GROUP BY] ...  --그릅화
+  [HAVING] ...  -- 그룹 조건
+  [ORDER BY] ... -- 정렬
+  ```
+  - 예시 : `SELECT m FROM Member as m WHERE m.age > 18;`
+- UPDATE문
+  ```sql
+  UPDATE ...
+  [WHERE] ...
+  ```
+- DELETE문
+  ```sql
+  DELETE ...
+  WHERE ...
+  ```
+
+### 10.2.3 JPQL 문법 - 구분
+- 엔티티와 속성은 대소문자 구분함. (Member, age, ...)
+- JPQL 키워드는 대소문자를 구분하지 않음 (SELECT, FROM, WHERE)
+- 엔티티 이름 사용, 테이블 이름이 아님. (Member)
+  - `@Entity(name = "...")`에서 엔티티 이름을 지정할 경우 이를 사용함. 그런데 실무에선 그렇게 잘 사용 안 함
+- 별칭은 필수(예: Member as m)(as 키워드 생략 가능)
+
+### 10.2.4 TypeQuery, Query
+- TypeQuery : `em.createQuery(jpql, Member.class)`
+  - 반환타입이 명확할 때 사용
+- Query : `em.createQuery(jpql)`
+  - 반환타입이 명확하지 않을 때 사용
+
+### 10.2.5 결과조회 API
+- `query.getResultList()` : 결과가 하나 이상일 때 사용. 리스트 반환.
+  - 결과가 없으면 빈 리스트 반환
+  - 예외로부터 안전하다.
+- query.getSingleResult() : 결과가 정확히 하나일 때 사용. 단일 객체 반환
+  - 결과가 없으면 예외 발생 : `javax.persistence.NoResultException`
+  - 결과가 둘 이상이면 예외 발생 : `javax.persistence.NonUniqueResultException`
+
+### 10.2.6 파라미터 바인딩 - 이름 기준, 위치 기준
+- 파라미터 이름 기준
+  ```java
+    String jpql1 = "SELECT m FROM Member as m WHERE m.name = :memberName";
+    Member findMember = em.createQuery(jpql1, Member.class)
+                        .setParameter("memberName", member.getName())
+                        .getSingleResult();
+  ```
+- 파라미터 위치 기준 (장애 발생 가능성이 많음. 사용하지 않는 것을 권장)
+  ```java
+    String jpql2 = "SELECT m FROM Member as m Where m.name = ?1";
+    Member findMember = em.createQuery(jpql2, Member.class)
+                        .setParameter(1, member.getName())
+                        .getSingleResult();
+  ```
+
+</div>
+</details>
+
 ---
 
