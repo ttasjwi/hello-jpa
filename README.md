@@ -1574,5 +1574,49 @@ List<Member> resultList = em.createNativeQuery(sql, Member.class).getResultList(
 </div>
 </details>
 
+## 10.3 프로젝션
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 10.3.1 프로젝션이란?
+- SELECT 절에서 조회할 대상을 지정하는 것
+- 프로젝션 대상 : 엔티티, 임베디드 타입, 스칼라 타입(숫자, 문자 등 기본 데이터 타입)
+- 종류
+  - 엔티티 프로젝션 : 영속성 컨텍스트의 관리 대상이 된다.
+    - `SELECT m FROM Member as m`
+    - `SELECT m.team FROM MEMBER as m` : 조인쿼리가 나가는데 실제로는 이렇게 쓰지 말고 명시적으로 조인 SQL을 작성하는게 좋다.
+  - 임베디드 타입 프로젝션
+    - `SELECT m.address FROM MEMBER as m`
+  - 스칼라 타입 프로젝션
+    - `SELECT m.name, m.age FROM MEMBER as m`
+- DISTINCT 키워드로 중복을 제거할 수 있다.
+  - 예> `SELECT DISCINCT m.team FROM MEMBER as m`
+
+### 10.3.2 프로젝션 - 여러값 조회
+> SELECT m.username, m.age FROM Member as m
+```java
+String jpql = "SELECT new jpql.MemberDTO(m.name, m.age) FROM Member as m";
+List<MemberDTO> memberDTOs = em.createQuery(jpql, MemberDTO.class)
+        .getResultList();
+for (MemberDTO memberDTO : memberDTOs) {
+    System.out.println("memberDTO.name = " + memberDTO.getName());
+    System.out.println("memberDTO.age = " + memberDTO.getAge());
+}
+```
+보통 다음 두 가지 방식으로 데이터를 조회한다.
+- List에 지네릭을 `Object[]`타입으로 걸어 가져온 뒤 각각 가져오기
+  - 프로젝션에 지정한 순서대로 값이 담겨옴.
+  - 별도로 형변환을 해야함. 
+    - 예) m.name은 0번 인덱스, m.age는 1번 인덱스에 Object 타입으로 받아와짐 
+- new 명령어를 사용하여 적당한 DTO를 생성하여 값을 담아오기
+  - 패키지 명을 포함한 FQCN 입력
+  - 순서와 타입이 일치하는 생성자 필요
+  - 이 방식에서 잘못 입력할 때, 컴파일러의 도움을 받을 수 없는 문제가 있는데 QueryDSL에서 이를 극복할 수 있다.
+
+</div>
+</details>
+
 ---
 
