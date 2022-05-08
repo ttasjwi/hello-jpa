@@ -1671,4 +1671,61 @@ List<Member> members = em.createQuery("SELECT m FROM Member as m ORDER BY m.age 
 </div>
 </details>
 
----
+## 10.6 서브쿼리
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 10.6.1 JPQL 서브 쿼리
+- 나이가 평균보다 많은 회원
+  ```sql
+  SELECT m
+  FROM Member as m
+  WHERE
+     m.age > (SELECT avg(m2.age)
+              FROM Member as m2
+              );
+  ```
+- 한 건이라도 주문한 고객
+  ```sql
+  SELECT m
+  FROM Member as m
+  WHERE
+  (SELECT count(o) FROM Order as o WHERE m = o.member)
+  as numberOfMemberOrder > 0
+  ```
+
+### 10.6.2 서브쿼리 지원 함수
+- `[NOT] EXISTS (서브쿼리...)` : 서브쿼리에서 반환되는 행이 존재하면 true
+- `ALL (서브쿼리)` : 모두 만족하면 참
+- `ANY (서브쿼리)`, `SOME (서브쿼리)` : 하나라도 조건을 만족하면 참
+- `[NOT] IN (서브쿼리...)` : 서브쿼리의 결과 중 하나라도 같은 것이 있으면 참
+
+### 10.6.3 서브쿼리 - 예제
+- 팀 A 소속인 회원들
+  ```sql
+  SELECT m FROM Member as m
+  WHERE EXISTS (SELECT t FROM m.team as t WHERE t.name = '팀A');
+  ```
+- 전체 상품 각각의 재고보다 주문량이 많은 주문들
+  ```sql
+  SELECT o FROM Order as o
+  WHERE o.orderAmount > ALL (SELECT p.stockAmount FROM Product as p);
+  ```
+- 어떤 팀이든 팀에 소속된 회원
+  ```sql
+  SELECT m FROM Member as m
+  WHERE m.team = ANY(SELECT t FROM Team as t);
+  ```
+
+### 10.6.4 JPA 서브쿼리의 한계
+
+- JPA는 WHERE, HAVING 절에서만 서브 쿼리를 사용할 수 있다.
+- 하이버네이트에서는 SELECT절에서도 서브 쿼리를 사용할 수 있다.
+- FROM절의 서브쿼리는 JPQL에서 지원되지 않는다.
+  - 조인으로 풀 수 있으면 풀어서 해결
+  - 영 안 되면 native SQL 사용
+
+</div>
+</details>
