@@ -1928,4 +1928,61 @@ public class MyH2Dialect extends H2Dialect {
 </div>
 </details>
 
+## 11.2 페치 조인
+
+### 11.2.1 페치 조인이란?
+- SQL에서 지원하는 조인이 아님
+- JPQL에서 성능 최적화를 위해 제공하는 기능
+- 연관된 엔티티나, 컬렉션을 SQL 한번에 조회하는 기능
+- join fetch 명령어를 사용하여 한 방에 가져오기
+- 페치 조인 : `[left [outer] | inner] join fetch 조인경로
+
+### 11.2.2 엔티티 페치 조인
+```sql
+-- jpql
+SELECT m FROM Member as m JOIN FETCH m.team;
+
+-- sql
+SELECT m.*, t.*
+FROM Member as m
+INNER JOIN Team as t ON m.team_id = t.team_id;
+```
+- 회원을 조회하면서 연관된 팀도 함께 조회(SQL 한 방에 가져오기)
+- 실제 SQL을 보면 회원 뿐만 아니라 팀도 함께 Select 해온다.
+
+### 11.2.3 컬렉션 페치 조인
+```sql
+-- jpql
+SELECT t FROM Team as t JOIN FETCH t.members WHERE t.name = 'teamA';
+
+-- sql
+SELECT t.*, m.*
+FROM Team as t
+INNER JOIN Member as m ON t.team_id = m.team_id
+WHERE t.name = 'teamA';
+```
+- 일대다 관계를 페치 조인
+- 팀과 회원들 각각의 엔티티를 모두 영속성 컨텍스트로 땡겨옴
+- 주의점
+  - 일대다 조인이기 때문에 한 team에 대해 여러 member가 조인되므로 row가 늘어남
+  - 실제 받아온 list에는 같은 team 변수가 2개 들어있음
+    - 물론 이들은 같은 식별자를 가진 team이고, 영속성 컨텍스트에서 관리됨
+    - 하나의 Team 인스턴스를 가리킨다.
+
+### 11.2.4 컬렉션 페치 조인 - 중복 제거
+- SQL의 distinct는 중복된 결과를 제거하는 명령
+  - row의 모든 값이 같으면 중복으로 보고 제거함
+- JPQL의 distinct는 다음 두가지 기능을 제공한다.
+  - SQL에 distinct를 추가하여 날림
+    - 이것만으로는 행마다 내용이 다르므로, 완전히 중복이 제거되지 않음
+  - 애플리케이션 단에서, 같은 식별자를 가진 엔티티의 중복을 제거한다.
+
+
+### 11.2.5 일반 조인과 페치 조인의 차이
+- 일반조인 : 연관된 엔티티를 함께 조회하지 않음 (즉시로딩 X)
+  - JPQL은 단순히 SELECT 절에서 지정한 엔티티만 조회함
+  - 연관관계를 고려하지 않음. TEAM만 지정하면 Team 엔티티만 조회하고, 연관 엔티티는 조회 x
+- 페치조인 : 연관된 엔티티를 함께 조회 (즉시 로딩)
+  - 객체 그래프를 SQL 한번에 조회하는 개념
+
 ---
