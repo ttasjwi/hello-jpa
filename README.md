@@ -1759,4 +1759,54 @@ List<Member> members = em.createQuery("SELECT m FROM Member as m ORDER BY m.age 
 </div>
 </details>
 
+## 10.8 조건식
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 10.8.1 기본 CASE식
+```sql
+SELECT
+    CASE
+        when m.age <= 10 then '학생요금'
+        when m.age >= 60 then '경로요금'
+        else '일반요금'
+    end
+FROM Member as m;
+```
+
+### 10.8.2 단순 CASE식
+```sql
+SELECT
+    CASE t.name
+        when '팀A' then '인센티브 110%'
+        when '팀B' then '인센티브 120%'
+        else '인센티브 105%'
+    end
+FROM Team as t;
+```
+
+### 10.8.3 그 외 조건식
+- Coalesce(스칼라식1, 스칼라식2, ...)
+  - 지정 스칼라식들을 순서대로 확인하여 null이 아닌 첫번째 값을 반환
+
+- NULLIF(스칼라식1, 스칼라식2)
+  - 두 값이 일치하는 지 확인하여 다르면 첫번째 값
+  - 같으면 null 반환
+
+- 예시 1 : 사용자 이름이 없으면 '이름 없는 회원'을 반환. 나머지는 본인의 이름
+  ```sql
+  SELECT coalesce(m.name, '이름 없는 회원')
+  FROM Member as m;
+  ```
+- 예시 2 : 사용자 이름이 '관리자'이면 null 반환. 나머지는 본인의 이름
+  ```sql
+  SELECT nullif(m.name, '관리자')
+  FROM Member as m;
+  ```
+
+</div>
+</details>
+
 ---
