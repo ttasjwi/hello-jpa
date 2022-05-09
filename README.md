@@ -1850,3 +1850,82 @@ public class MyH2Dialect extends H2Dialect {
 </details>
 
 ---
+
+# Section 11. JPQL - 중급문법
+
+## 11.1 경로 표현식 및 조인
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 11.1.1 경로 표현식
+> .(점)을 찍어서 객체 그래프를 탐색하는 것
+- 상태필드 : 단순히 값을 저장하기 위한 필드
+    - 예) m.name
+- 연관 필드 : 연관관계를 위한 필드
+  - 단일 값 연관 필드 : `@ManyToOne`, `@OneToOne`
+    - 예) m.team
+  - 컬렉션 값 연관 필드 : `@OneToMany`, `@ManyToMany`
+    - 예) t.members
+
+### 11.1.2 경로 표현식의 특징
+- 상태필드 : 경로 탐색의 끝. 더 이상 탐색할 수 없다.
+- 단일 값 연관 경로 : 묵시적 내부조인(inner join) 발생. 더 이상 탐색할 수 있다.
+  - join 쿼리를 작성하지 않았음에도 join 쿼리가 날아감. 쿼리를 예측하기 힘듬
+- 컬렉션 값 연관 경로 : 묵시적 내부 조인 발생. Collection으로 얻어와지며, 더 이상 탐색할 수 없다.
+  - From 절에서, 명시적 조인을 통해 별칭을 얻으면 별칭을 통해서 내부탐색이 가능하다.
+
+### 11.1.3 경로 탐색
+- 연관 경로 탐색 시 묵시적 join이 발생하는 문제가 발생함.
+- 상대필드 경로 탐색
+  ```sql
+  -- jpql
+  SELECT m.name, m.age FROM Member as m;
+  
+  -- sql
+  SELECT m.name, m.age FROM Member as m;
+  ```
+- 단일 값 연관 경로 탐색
+  ```sql
+  -- jpql
+  SELECT o.member from Order as o;
+  
+  -- sql
+  SELECT m.*
+  FROM Orders as o
+    INNER JOIN Member as m ON o.member_id = m.member_id;
+  ```
+
+### 11.1.4 명시적 조인, 묵시적 조인
+- 명시적 조인 : join 키워드를 명시적으로 직접 사용
+  - 예) SELECT m From Member m INNER JOIN m.team as t;
+- 묵시적 조인 : 경로 표현식에 의해 묵시적으로 SQL 조인이 발생(내부 조인만 가능)
+  - 예) SELECT m.team FROM Member as m;
+- 예시
+  ```sql
+  SELECT o.member.team from Order as o; -- 성공
+  
+  SELECT t.members from Team as t; -- 성공
+  
+  SELECT t.members.name from Team as t; -- 실패
+  
+  SELECT m.name from Team as t JOIN t.members as m; -- 성공
+  ```
+
+### 11.1.5 경로 탐색을 사용한 묵시적 조인 시 주의사항
+- 항상 내부조인이 발생함
+- 컬렉션은 경로 탐색의 끝. 명시적 조인을 통해 별칭을 얻어야 내부 탐색이 가능
+- 경로 탐색은 주로 SELECT, WHERE 절에서 사용하지만, 묵시적 조인으로 인해 SQL의 FROM(JOIN)절에 영향을 줌.
+  - 예상치 못 한 조인 쿼리가 발생함. 성능 튜닝에서 곤란해진다.
+
+### 11.1.6 실무 조언
+- 가급적 묵시적 조인 대신에 명시적 조인을 사용하라.
+- 조인은 SQL 튜닝에 중요 포인트.
+  - ORM이 아무리 객체지향적이더라도, JOIN은 성능 튜닝에 있어 핵심적인 요소이므로 명시적으로 조인을 하자.
+- 묵시적 조인은 조인이 일어나는 상황을 한 눈에 파악하기 힘듬.
+
+</div>
+</details>
+
+---
