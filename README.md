@@ -1809,4 +1809,44 @@ FROM Team as t;
 </div>
 </details>
 
+## 10.9 JPQL 함수
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 10.9.1 JPQL 기본 함수
+JPQL이 제공하는 표준 함수들. DB에 관계 없이 사용가능하다.
+- CONCAT
+- SUBSTRING
+- TRIM
+- LOWER, UPPER
+- LENGTH
+- LOCATE
+- ABS, SQRT, MOD
+- SIZE
+- INDEX(JPA의 `@OrderColumn` 대응)
+
+### 10.9.2 사용자 정의 함수
+```java
+public class MyH2Dialect extends H2Dialect {
+
+    public MyH2Dialect() {
+       registerFunction("group_concat", new StandardSQLFunction("group_concat", StandardBasicTypes.STRING));
+    }
+}
+```
+```xml
+<property name="hibernate.dialect" value="dialect.MyH2Dialect"/>
+```
+- 사용 전 방언에 추가해야함
+  - 기본 방언 : DB에서 기본적으로 제공하는 방언 클래스 `persistence.xml`에 등록
+  - 사용자 정의함수
+    - DB방언 클래스 상속
+    - 생성자로 추가적으로 정의한 함수를 `registerFunction`메서드로 추가.
+    - 상속체를 persistence.xml에 방언 등록
+
+</div>
+</details>
+
 ---
