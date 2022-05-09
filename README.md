@@ -1729,3 +1729,34 @@ List<Member> members = em.createQuery("SELECT m FROM Member as m ORDER BY m.age 
 
 </div>
 </details>
+
+## 10.7 JPQL 타입 표현식, 기타
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 10.7.1 JPQL 타입 표현식
+- 문자
+  - 작은 따옴표로 표현 : 'Hello'
+  - 작은 따옴표 쓰고 싶으면 두번 입력 : 'She''s'
+- 숫자
+  - Long : 10L
+  - Double : 10D
+  - Float : 10F
+- Boolean : true, false
+- ENUM : jpabook.MemberType.Admin(FQCN으로 작성)
+  - 하드코딩을 하고 싶지 않다면 파라미터 지정을 하는 방법, QueryDSL을 사용하는 방법을 사용
+- 엔티티 타입 : Type(m) = Member(상속 관계에서 사용)
+
+### 10.7.2 JPQL 기타 표현식
+- SQL과 문법이 같은 식들.
+- EXISTS, IN
+- AND, OR, NOT
+- `=`, `>`, `>=`, `>`, `>=`, `<>`
+- BETWEEN, LIKE, IS NULL
+
+</div>
+</details>
+
+---
