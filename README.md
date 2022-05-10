@@ -2106,4 +2106,67 @@ SELECT m FROM member as m WHERE m.team_id = ?
 </div>
 </details>
 
+## 11.5 Named 쿼리
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 11.5.1 Named 쿼리
+- 미리 정의해서 이름을 부여해두고 사용하는 JPQL
+- 정적 쿼리
+- 어노테이션, XML에 정의
+- 애플리케이션 로딩 시점에 초기화 후 재사용
+- 애플리케이션 로딩 시점에 쿼리를 검증
+
+### 11.5.2 Named 쿼리 - 어노테이션
+```java
+@Entity
+@NamedQuery(
+        name = "Member.findByName",
+        query = "SELECT m FROM Member as m WHERE m.name = :name"
+)
+public class Member {
+```
+```java
+Member findMember = em.createNamedQuery("Member.findByName", Member.class)
+        .setParameter("name", "memberA")
+        .getSingleResult();
+```
+- `@NamedQuery` : 정적 쿼리를 정의
+  - name : 사용할 쿼리 이름
+  - query : 정적 쿼리
+- `em.createNamedQuery` : 등록된 jpql을 통해 DB 조회
+
+### 11.5.3 Named 쿼리 - XML에 정의
+```xml
+<!--[META-INF/persistence.xml] -->
+<persistence-unit name = "jpabook">
+    <mapping-file>META-INF/ormMember.xml</mapping-file>
+</persistence-unit>
+```
+```xml
+<!--[META-INF/ormMember.xml] -->
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm" version="2.1">
+    <named-query name="Member.findByName">
+        <query><![CDATA[
+        select m
+        from Member m
+        where m.name = :name
+        ]]></query>
+    </named-query>
+    <named-query name="Member.count">
+        <query>select count(m) from Member m</query>
+    </named-query>
+</entity-mappings>
+```
+
+### 11.5.4 Named 쿼리 환경에 따른 설정
+- XML이 항상 우선권을 가짐
+- 애플리케이션 운영 환경에 따라 다른 XML을 배포할 수 있다.
+
+</div>
+</details>
+
 ---
