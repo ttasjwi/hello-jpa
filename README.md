@@ -2070,4 +2070,40 @@ where i.DTYPE = 'B' and i.author = 'kim';
 </div>
 </details>
 
+## 11.4 엔티티 직접 사용
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 11.4.1 기본키
+```java
+String jpql = "SELECT m FROM Member as m WHERE m = :member";
+List<Member> members = 
+        em.createQuery(jpql, Member.class)
+        .setParameter("member", member)
+        .getResultList();
+```
+```sql
+SELECT m FROM member as m WHERE m.member_id = ?
+```
+- JPQL에서 엔티티를 직접 사용하면 SQL에서 해당 엔티티의 기본키 값을 사용함.
+- 즉 파라미터를 전달할 때 식별자를 쓰는 방법, 엔티티를 직접 쓰는 방법 두가지 방식이 가능
+
+### 11.4.2 외래키
+```java
+String jpql = "SELECT m FROM Member as m WHERE m.team = :team";
+List<Member> members = 
+        em.createQuery(jpql, Member.class)
+        .setParameter("team", teamA)
+        .getResultList();
+```
+```sql
+SELECT m FROM member as m WHERE m.team_id = ?
+```
+- 연관객체 : 외래키 쿼리가 날아간다.
+
+</div>
+</details>
+
 ---
