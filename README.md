@@ -2032,3 +2032,42 @@ private List<Member> members = new ArrayList<>();
 
 </div>
 </details>
+
+## 11.3 다형성 쿼리
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 11.3.1 TYPE
+```sql
+--jpql
+SELECT i FROM Item as i
+WHERE type(i) in (Book, Movie);
+
+--sql
+SELECT i.* From Item as i
+where i.DTYPE in ('B', 'M');
+```
+- 조회 대상을 특정 자식으로 한정
+  - 예) Item 중에 Book, Movie를 조회해라.
+
+### 11.3.2 TREAT(JPA 2.1~)
+- 자바의 타입 캐스팅과 유사
+- 상속 구조에서 부모 타입을 특정 자식타입으로 다룰 때 사용
+- FROM, WHERE, SELECT(하이버네이트 지원)에서 사용
+```sql
+--jpql
+SELECT i from Item i
+WHERE treat(i as Book).author = 'kim';
+
+---sql
+SELECT i.* FROM Item i
+where i.DTYPE = 'B' and i.author = 'kim';
+```
+- 예시) 부모인 Item과 자식 Book이 있을 때 Book으로 다루기 
+
+</div>
+</details>
+
+---
