@@ -2169,4 +2169,44 @@ Member findMember = em.createNamedQuery("Member.findByName", Member.class)
 </div>
 </details>
 
+## 11.6 벌크 연산
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+### 11.6.1 여러 데이터를 조작하고 싶다!
+- 특정 조건에 부합하는 상품의 가격을 변경하고 싶을 때, JPA 변경감지 기능으로 실행하려면 너무 많은 SQL을 실행해야함.
+  1. 조건에 맞는 상품을 리스트로 조회
+  2. 각각의 엔티티의 가격을 10% 증가
+  3. 트랜잭션 커밋 시점에 변경감지가 동작
+- 조건에 맞는 데이터가 100만건이면, 100만번의 SQL 실행
+
+### 11.6.2 벌크 연산
+- JPA 변경 감지 기능으로 실행하지 않고 쿼리 한번으로 여러 테이블의 row 변경(엔티티)
+- executeUpdate()의 결과는 영향받은 엔티티 수를 반환
+- UPDATE, DELETE 지원
+- 하이버네이트는 INSERT(insert into ... select ... ) 지원
+
+### 11.6.3 벌크 연산 주의
+```java
+int resultCount = em.createQuery("update Member as m SET m.age = 20")
+        .executeUpdate();
+em.clear();
+```
+- 벌크 연산은 영속성 컨텍스트를 무시하고 데이터베이스에 직접 쿼리.
+- 즉, DB에 쿼리만 날리고 영속성 컨텍스트에 저장된 엔티티의 상태를 그에 맞게 변경시키지 않는다.
+- 기존에 영속성 컨텍스트에 엔티티가 남아있다면 데이터 정합성에서 문제가 발생
+- 이 문제를 해결하려면 다음 두 가지 방법을 사용
+  - 벌크 연산을 먼저 실행하고 엔티티 조회
+  - 엔티티가 남아있다면 **벌크 연산 수행 후 영속성 컨텍스트 초기화(clear)**
+
+#### 플러시 시점
+- commit
+- query 날아갈 때
+- 강제 flush 호출 (em.flush)
+
+</div>
+</details>
+
 ---
