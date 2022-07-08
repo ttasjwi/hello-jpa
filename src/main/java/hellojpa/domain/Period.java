@@ -1,10 +1,16 @@
 package hellojpa.domain;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Embeddable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Embeddable
+@Getter @Setter
+@EqualsAndHashCode(of = {"startDate", "endDate"})
 public class Period {
 
     private LocalDateTime startDate;
@@ -18,32 +24,4 @@ public class Period {
         this.endDate = endDate;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Period period = (Period) o;
-        return Objects.equals(startDate, period.startDate) && Objects.equals(endDate, period.endDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(startDate, endDate);
-    }
 }

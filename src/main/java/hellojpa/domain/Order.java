@@ -1,10 +1,14 @@
 package hellojpa.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
+@Getter @Setter
 public class Order {
 
     @Id
@@ -22,44 +26,4 @@ public class Order {
 
     private int orderAmount;
     private LocalDateTime orderDate;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Member getMember() {
-        return member;
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public int getOrderAmount() {
-        return orderAmount;
-    }
-
-    public void setOrderAmount(int orderAmount) {
-        this.orderAmount = orderAmount;
-    }
-
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
 }

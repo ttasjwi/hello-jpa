@@ -1,5 +1,8 @@
 package hellojpa.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,6 +13,7 @@ import static javax.persistence.CascadeType.*;
 
 @Entity
 @Table(name = "member")
+@Getter @Setter
 public class Member extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,76 +52,4 @@ public class Member extends BaseEntity {
             @AttributeOverride(name = "zipcode", column = @Column(name = "company_zipcode"))
     })
     private Address companyAddress;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-
-    public Period getWorkPeriod() {
-        return workPeriod;
-    }
-
-    public void setWorkPeriod(Period workPeriod) {
-        this.workPeriod = workPeriod;
-    }
-
-    public Address getHomeAddress() {
-        return homeAddress;
-    }
-
-    public void setHomeAddress(Address homeAddress) {
-        this.homeAddress = homeAddress;
-    }
-
-    public Address getCompanyAddress() {
-        return companyAddress;
-    }
-
-    public void setCompanyAddress(Address companyAddress) {
-        this.companyAddress = companyAddress;
-    }
-
-    public Set<String> getFavoriteFoods() {
-        return favoriteFoods;
-    }
-
-    public void setFavoriteFoods(Set<String> favoriteFoods) {
-        this.favoriteFoods = favoriteFoods;
-    }
-
-    public List<AddressEntity> getAddressHistory() {
-        return addressHistory;
-    }
-
-    public void setAddressHistory(List<AddressEntity> addressHistory) {
-        this.addressHistory = addressHistory;
-    }
 }

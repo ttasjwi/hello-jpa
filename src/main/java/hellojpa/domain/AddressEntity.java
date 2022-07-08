@@ -1,9 +1,16 @@
 package hellojpa.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "address")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter @Setter
 public class AddressEntity {
 
     @Id @GeneratedValue
@@ -13,9 +20,6 @@ public class AddressEntity {
     @Embedded
     private Address address;
 
-    public AddressEntity() {
-    }
-
     public AddressEntity(Address address) {
         this.address = address;
     }
@@ -24,19 +28,4 @@ public class AddressEntity {
         this(new Address(city, street, zipcode));
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
 }
