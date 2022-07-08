@@ -1,7 +1,6 @@
 package hellojpa;
 
 import hellojpa.domain.Address;
-import hellojpa.domain.AddressEntity;
 import hellojpa.domain.Member;
 
 import javax.persistence.EntityManager;
@@ -36,6 +35,7 @@ public class JpaMain {
 
             tx.commit();
         } catch(Exception e) {
+            e.printStackTrace();
             tx.rollback();
         } finally {
             em.close();
