@@ -1,8 +1,5 @@
 package hellojpa;
 
-import hellojpa.domain.Address;
-import hellojpa.domain.Member;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -10,29 +7,16 @@ import javax.persistence.Persistence;
 import java.util.List;
 
 public class JpaMain {
+
     public static void main(String[] args) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
         EntityManager em = emf.createEntityManager();
 
         EntityTransaction tx = em.getTransaction();
-        tx.begin();
 
         try {
-            Member member = new Member();
-            member.setName("ttasjwi");
-            member.setHomeAddress(new Address("서울특별시", "강남구", "11111"));
-            em.persist(member);
-
-            em.flush();
-            em.clear();
-
-            String jpql = "SELECT m FROM Member as m WHERE m.name = 'ttasjwi'";
-            List<Member> resultList = em.createQuery(jpql, Member.class).getResultList();
-
-            for (Member findMember : resultList) {
-                System.out.println("findMember.name = " + findMember.getName());
-            }
-
+            tx.begin();
+            logic(em);
             tx.commit();
         } catch(Exception e) {
             e.printStackTrace();
@@ -41,5 +25,30 @@ public class JpaMain {
             em.close();
         }
         emf.close();
+    }
+
+    private static void logic(EntityManager em) {
+        Book book = Book.builder()
+                .name("땃쥐의 JPA")
+                .price(10000)
+                .build();
+
+        // 등록
+        em.persist(book);
+
+        // 수정
+        book.changeBookInfo("상땃쥐의 JPA", 20000);
+
+        // 단건 조회
+        Book findBook = em.find(Book.class, book.getId());
+        System.out.println(findBook);
+
+        // 목록 조회
+        List<Book> books = em.createQuery("SELECT b FROM Book as b", Book.class)
+                .getResultList();
+        System.out.println("books.size = "+books.size());
+
+        // 삭제
+        em.remove(book);
     }
 }
