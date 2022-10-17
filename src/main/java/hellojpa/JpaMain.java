@@ -28,27 +28,13 @@ public class JpaMain {
     }
 
     private static void logic(EntityManager em) {
-        Book book = Book.builder()
-                .name("땃쥐의 JPA")
-                .price(10000)
-                .build();
+        Book book = new Book("땃쥐의 Spring", 30000); // 비영속 상태
+        em.persist(book); // 영속화
+        em.flush(); // 쓰기지연 SQL 저장소에 누적되어 있는 SQL을 DB에 반영
 
-        // 등록
-        em.persist(book);
+        em.detach(book); // 준영속 상태 (영속성 컨텍스트에서 분리)
 
-        // 수정
-        book.changeBookInfo("상땃쥐의 JPA", 20000);
-
-        // 단건 조회
-        Book findBook = em.find(Book.class, book.getId());
-        System.out.println(findBook);
-
-        // 목록 조회
-        List<Book> books = em.createQuery("SELECT b FROM Book as b", Book.class)
-                .getResultList();
-        System.out.println("books.size = "+books.size());
-
-        // 삭제
-        em.remove(book);
+        Book findBook = em.find(Book.class, book.getId());// 영속 상태
+        em.remove(findBook); // 삭제 (DB, 영속성 컨텍스트로부터)
     }
 }
